@@ -1,6 +1,9 @@
 package me.wand555.OWA.Commands;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Location;
@@ -12,9 +15,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import me.wand555.OWA.Main.AdminAreaType;
 import me.wand555.OWA.Main.OWA;
+import me.wand555.OWA.Player.AdminArea;
+import me.wand555.OWA.Player.AdminProfile;
 import me.wand555.OWA.Player.Campfire;
 import me.wand555.OWA.Player.PlayerProfile;
+import me.wand555.OWA.Timer.AdminAreaTimer;
 
 public class CE implements CommandExecutor {
 	
@@ -45,7 +52,7 @@ public class CE implements CommandExecutor {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
 			if(cmd.getName().equalsIgnoreCase("setwarp")) {
-				if(p.hasPermission("owa.setwarp")) {
+				if(p.hasPermission("owa.warp.set")) {
 					if(args.length == 1) {
 						Location loc = getNearestCampfire(p.getLocation());
 						if(loc != null) {
@@ -87,7 +94,7 @@ public class CE implements CommandExecutor {
 				}	
 			}
 			else if(cmd.getName().equalsIgnoreCase("warp")) {
-				if(p.hasPermission("owa.warp")) {
+				if(p.hasPermission("owa.warp.use")) {
 					if(args.length == 0) {
 						PlayerProfile profile = PlayerProfile.getProfileFromPlayer(p.getUniqueId());
 						System.out.println(profile.getCampfires().size());
@@ -115,7 +122,7 @@ public class CE implements CommandExecutor {
 				}		
 			}
 			else if(cmd.getName().equalsIgnoreCase("delwarp")) {
-				if(p.hasPermission("owa.delwarp")) {
+				if(p.hasPermission("owa.warp.delete")) {
 					if(args.length == 0) {
 						PlayerProfile profile = PlayerProfile.getProfileFromPlayer(p.getUniqueId());
 						if(profile.getCampfires().size() == 1) {
@@ -144,6 +151,121 @@ public class CE implements CommandExecutor {
 						
 					}
 				}	
+			}
+			else if(cmd.getName().equalsIgnoreCase("warplist")) {
+				if(p.hasPermission("owa.warp.list")) {
+					if(args.length == 0) {
+						PlayerProfile profile = PlayerProfile.getProfileFromPlayer(p.getUniqueId());
+						if(!profile.getCampfires().isEmpty()) {
+							p.sendMessage("------Campfires------");
+							for(Campfire campfire : profile.getCampfires()) {
+								Location campfireLoc = campfire.getCampfireLoc();
+								String name = campfire.getName().get(p.getUniqueId());
+								Location loc = campfire.getLoc().get(p.getUniqueId());
+								p.sendMessage(name + " at " + loc.getBlockX() + "/" + loc.getBlockY() + "/" + loc.getBlockZ()
+									+ " from the campfire at " + campfireLoc.getBlockX() + "/" + campfireLoc.getBlockY() + "/" + campfireLoc.getBlockZ() + "!");
+							}
+						}
+						else {
+							p.sendMessage("You dont have any warps set");
+						}
+					}
+					else {
+						
+					}
+				}
+			}
+			else if(cmd.getName().equalsIgnoreCase("setzone")) {
+				if(p.hasPermission("owa.admin.zone.set")) {
+					//give item
+					if(args.length == 2) {
+						if(args[1].equalsIgnoreCase("s")) {
+							AdminArea adminArea = AdminArea.getAdminAreaFromName(args[0]);
+							if(adminArea == null) {
+								AdminProfile profile = AdminProfile.getAdminProfileFromUUID(p.getUniqueId());
+								if(profile.isAreaSetting()) {
+									p.sendMessage("You're already setting an area!");
+								}
+								else {
+									profile.setAreaSetting(true);
+									profile.setType(AdminAreaType.SAFE_CAMP);
+									profile.setName(args[0]);
+									p.getInventory().addItem(OWA.hoeItem);
+									p.sendMessage("Click the bounds with this item!");
+								}
+							}
+							else {
+								p.sendMessage("Area are with given name already exists");
+							}
+						}
+					}
+					
+					//CHECK IF args[2] und args[3] nummbern sind!!!!!
+					else if(args.length == 4) {		
+						if(args[1].equalsIgnoreCase("zc")) {
+							AdminArea adminArea = AdminArea.getAdminAreaFromName(args[0]);
+							if(adminArea == null) {
+								AdminProfile profile = AdminProfile.getAdminProfileFromUUID(p.getUniqueId());
+								if(profile.isAreaSetting()) {
+									p.sendMessage("You're already setting an area!");
+								}
+								else {
+									profile.setAreaSetting(true);
+									profile.setType(AdminAreaType.ZOMBIE_CAMP);
+									profile.setSpawnAmount(Integer.valueOf(args[2]));
+									profile.setTickrate(Long.valueOf(args[3]));
+									p.getInventory().addItem(OWA.hoeItem);
+									p.sendMessage("Click the bounds with this item!");
+								}
+							}
+							else {
+								p.sendMessage("Area with given name already exists");
+							}
+						}
+						else {
+							p.sendMessage("Wrong format, only s or zc allowed as last parameter");
+						}
+					}
+					else {
+						p.sendMessage("Syntax: /setzone <uniqueName> <s OR zc> <spawnAmount> <tickrate>");
+					}
+				}
+			}
+			else if(cmd.getName().equalsIgnoreCase("removezone")) {
+				if(p.hasPermission("owa.admin.zone.remove")) {
+					if(args.length == 1) {
+						AdminArea adminArea = AdminArea.getAdminAreaFromName(args[0]);
+						if(adminArea != null) {
+							AdminProfile profile = AdminProfile.getAdminProfileFromUUID(adminArea.getCreator());
+							if(profile != null) {
+								if(adminArea.getRunningTask() != null) {
+									adminArea.getRunningTask().cancel();
+								}
+								profile.setFirstLocArea(null);
+								profile.setName(null);
+								profile.setSecondLocArea(null);
+								profile.setSpawnAmount(0);
+								profile.setTickrate(0);
+								profile.setType(null);
+							}		
+							AdminArea.getAdminAreas().remove(adminArea);
+							p.sendMessage("Removed zone");
+						}
+						else {
+							p.sendMessage("No match with given name");
+						}
+					}
+				}
+			}
+			else if(cmd.getName().equalsIgnoreCase("manageloot")) {
+				if(args.length == 1) {
+					
+					//give player shovel
+					// /manageloot <Optional: Number>
+					//each loot chest has a name
+					//left click == destroy loot
+					//right click == set loot
+				}
 			}
 		}
 		else {

@@ -7,6 +7,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.wand555.OWA.Main.OWA;
+import me.wand555.OWA.Player.AdminArea;
 
 public class ZombieSpawnListener implements Listener {
 
@@ -19,6 +20,15 @@ public class ZombieSpawnListener implements Listener {
 	
 	@EventHandler
 	public void onZombieSpawnEvent(CreatureSpawnEvent event) {
+		if(event.getEntity() instanceof Zombie) {
+			for(AdminArea adminArea : AdminArea.getAdminAreas()) {
+				if(adminArea.getArea().contains(event.getLocation())) {
+					event.setCancelled(true);
+					break;
+				}
+			}
+		}
+		
 		if(OWA.extremeMobSpawn) {
 			if(event.getEntity() instanceof Zombie) {
 				//maybe spawn in even more later;

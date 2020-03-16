@@ -32,6 +32,7 @@ public class LeashRightClickListener implements Listener {
 					if(!zombie.isLeashed()) {
 						event.getPlayer().getInventory().getItemInMainHand().setAmount(
 								event.getPlayer().getInventory().getItemInMainHand().getAmount()-1);
+						System.out.println("hdsgsdg");
 						new BukkitRunnable() {		
 							@Override
 							public void run() {

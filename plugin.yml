@@ -8,28 +8,30 @@ commands:
   setwarp:
     usage: /setwarp <name>
     description: Has to be near a campfire to set a warp.
-    permission: owa.setwarp
+    permission: owa.warp.set
     message: &cYou dont have permission to set a campfire!
   delwarp:
     usage: /delwarp <name>
     description: Deletes warp given from name.
-    permission: owa.delwarp
+    permission: owa.warp.delete
     message: &cYou dont have permission to set a campfire!
   warp:
     usage: /warp <name>
     description: Warps to the given name if existent. 
     permission: owa.warp.use
     message: &cYou dont have permission to teleport to a campfire!
-permissions:
-  owa.setwarp:
-    description: Allows the player to set a warp near a camp
-    default: op
-  owa.delwarp:
-    description: Allows the player to delete a warp they previously set
-    default: op
-  owa.warp:
-    description: Allows the player to teleport to a warp he has.
-    default: op
-  owa.spawn:
-    description: Decides whether zombies can spawn near him from the plugin
-    default: op
+  warplist:
+    usage: /warplist
+    description: Shows list of available warps.
+    permission: owa.warp.list
+  setzone:
+    usage: /setzone <uniqueName> <s OR zc> (ONLY FOR zc) <spawnAmount> (ONLY FOR zc) <tickrate>
+    description: Gives the player a hoe to set two locations with.
+    permission: owa.admin.zone.set
+  removezone:
+    usage: /removezone <uniqueName>
+    description: Removes zone from given name.
+    permission: owa.admin.zone.remove
+  setloot:
+    usage. /setloot <time>
+    description: Sets up a loot chest. Refills after <time> amount. If time == 0 it is one time only.

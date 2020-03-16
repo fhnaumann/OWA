@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.wand555.OWA.Main.OWA;
+import me.wand555.OWA.Player.AdminArea;
 import me.wand555.OWA.Player.PlayerProfile;
 
 public class DaylightZombieSpawning extends BukkitRunnable {
@@ -74,10 +75,17 @@ public class DaylightZombieSpawning extends BukkitRunnable {
 								while(i > 0) {
 									Location l = new Location(w, rLoc.getBlockX(), i, rLoc.getBlockZ());
 									if(l.getBlock().getType() != Material.AIR) {
+										
+										for(AdminArea adminArea : AdminArea.getAdminAreas()) {
+											if(adminArea.getArea().contains(l)) {
+												System.out.println("avoided spawn due to safe camp");
+												continue outerloop;
+											}
+										}
 										//spawn mob here (at 'l')
 										Zombie zombie = (Zombie) w.spawnEntity(l.getBlock().getRelative(BlockFace.UP).getLocation(), EntityType.ZOMBIE);
 										zombie.setRemoveWhenFarAway(true);
-										System.out.println(l.getBlockX() + " ABC  " + l.getBlockZ());
+										//System.out.println(l.getBlockX() + " ABC  " + l.getBlockZ());
 										continue outerloop;
 									}
 									i--;
@@ -90,10 +98,17 @@ public class DaylightZombieSpawning extends BukkitRunnable {
 									Location l = new Location(w, rLoc.getBlockX(), i, rLoc.getBlockZ());
 									//when mob has space to spawn
 									if(l.getBlock().getType() == Material.AIR && l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR) {
+										
+										for(AdminArea adminArea : AdminArea.getAdminAreas()) {
+											if(adminArea.getArea().contains(l)) {
+												System.out.println("avoided spawn due to safe camp");
+												continue outerloop;
+											}
+										}
 										//spawn mob
 										Zombie zombie = (Zombie) w.spawnEntity(l, EntityType.ZOMBIE);
 										zombie.setRemoveWhenFarAway(true);
-										System.out.println(l.getBlockX() + " DEF  " + l.getBlockZ());
+										//System.out.println(l.getBlockX() + " DEF  " + l.getBlockZ());
 										continue outerloop;
 									}
 									i++;
