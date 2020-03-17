@@ -10,12 +10,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import me.wand555.OWA.Main.Perk;
 
@@ -37,6 +44,7 @@ public class PlayerProfile {
 	private long experience;
 	private ArrayList<Perk> perks;
 	private ArrayList<Campfire> campfires;
+	private Scoreboard board;
 
 	/**
 	 * Called on the first join ever. When no information for that player is stored.
@@ -62,7 +70,89 @@ public class PlayerProfile {
 		this.experience = 0;
 		this.perks = new ArrayList<Perk>();
 		this.campfires = new ArrayList<Campfire>();
+		this.board = Bukkit.getScoreboardManager().getNewScoreboard();		
+		loadScoreboard();
+		p.setScoreboard(board);
+		
 		profiles.put(this.playerUUID, this);
+	}
+	//RESET THIRST AND TEMP ON DEATH
+	public void updateThirstScoreboard() {
+		board.getTeam("thirst").setSuffix(ChatColor.GOLD + Integer.toString(getThirst()) + ChatColor.GRAY + "/" + ChatColor.GOLD + Integer.toString(getMaxThirst()));
+	}
+	
+	public void updateTempScoreboard() {
+		board.getTeam("temp").setSuffix(ChatColor.GOLD + Integer.toString(getTemperature()) + ChatColor.GRAY + "/" + ChatColor.GOLD + Integer.toString(getMaxTemperature()));
+	}
+	
+	public void updateZombieKillScoreboard() {
+		board.getTeam("zombieKill").setSuffix(ChatColor.GOLD + Integer.toString(getZombieKills()));
+	}
+	
+	public void updatePlayerKillScoreboard() {
+		board.getTeam("playerKill").setSuffix(ChatColor.GOLD + Integer.toString(getPlayerKills()));
+	}
+	
+	public void updatePlayerDeathScoreboard() {
+		board.getTeam("playerDeath").setSuffix(ChatColor.GOLD + Integer.toString(getDeaths()));
+	}
+	
+	public void updateExperienceScoreboard() {
+		board.getTeam("experience").setSuffix(ChatColor.GOLD + Long.toString(getExperience()));
+	}
+	
+	public void updateBalanceScoreboard() {
+		System.out.println("no balance yet");
+	}
+	
+	/**
+	 * Call this method, after this.board = ...getNewScoreboard() has been called.
+	 */
+	private void loadScoreboard() {
+		Objective objective = board.registerNewObjective("stats", "dummy", ChatColor.BOLD + "YOUR STATS");
+		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+	
+		Team thirst = board.registerNewTeam("thirst");
+		thirst.setPrefix("Thirst: ");
+		thirst.setSuffix(ChatColor.GOLD + Integer.toString(getThirst()) + ChatColor.GRAY + "/" + ChatColor.GOLD + Integer.toString(getMaxThirst()));
+		thirst.addEntry(ChatColor.AQUA.toString());
+		objective.getScore(ChatColor.AQUA.toString()).setScore(15);
+		
+		Team temp = board.registerNewTeam("temp");
+		temp.setPrefix("Temperature: ");
+		temp.setSuffix(ChatColor.GOLD + Integer.toString(getTemperature()) + ChatColor.GRAY + "/" + ChatColor.GOLD + Integer.toString(getMaxTemperature()));
+		temp.addEntry(ChatColor.BLACK.toString());
+		objective.getScore(ChatColor.BLACK.toString()).setScore(14);
+		
+		Team zombieKill = board.registerNewTeam("zombieKill");
+		zombieKill.setPrefix("Zombie Kills: ");
+		zombieKill.setSuffix(ChatColor.GOLD + Integer.toString(getZombieKills()));
+		zombieKill.addEntry(ChatColor.BLUE.toString());
+		objective.getScore(ChatColor.BLUE.toString()).setScore(13);
+		
+		Team playerKill = board.registerNewTeam("playerKill");
+		playerKill.setPrefix("Player Kills: ");
+		playerKill.setSuffix(ChatColor.GOLD + Integer.toString(getPlayerKills()));
+		playerKill.addEntry(ChatColor.DARK_AQUA.toString());
+		objective.getScore(ChatColor.DARK_AQUA.toString()).setScore(12);
+		
+		Team playerDeath = board.registerNewTeam("playerDeath");
+		playerDeath.setPrefix("Player Death: ");
+		playerDeath.setSuffix(ChatColor.GOLD + Integer.toString(getDeaths()));
+		playerDeath.addEntry(ChatColor.DARK_BLUE.toString());
+		objective.getScore(ChatColor.DARK_BLUE.toString()).setScore(11);
+		
+		Team experience = board.registerNewTeam("experience");
+		experience.setPrefix("Experience: ");
+		experience.setSuffix(ChatColor.GOLD + Long.toString(getExperience()));
+		experience.addEntry(ChatColor.DARK_GRAY.toString());
+		objective.getScore(ChatColor.DARK_GRAY.toString()).setScore(10);
+		
+		Team balance = board.registerNewTeam("balance");
+		balance.setPrefix("Balance: ");
+		balance.setSuffix(ChatColor.GOLD + Integer.toString(0));
+		balance.addEntry(ChatColor.DARK_GREEN.toString());
+		objective.getScore(ChatColor.DARK_GREEN.toString()).setScore(9);
 	}
 	
 	

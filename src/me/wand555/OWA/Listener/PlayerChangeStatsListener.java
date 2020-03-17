@@ -22,13 +22,18 @@ public class PlayerChangeStatsListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerKillZombieOrPlayerEvent(EntityDeathEvent event) {
+	public void onPlayerKillZombieEvent(EntityDeathEvent event) {
 		if(event.getEntity() instanceof Zombie) {
 			Player p = ((LivingEntity) event.getEntity()).getKiller();
-			PlayerProfile profile = PlayerProfile.getProfileFromPlayer(p.getUniqueId());
-			profile.setZombieKills(profile.getZombieKills() + 1);
-			profile.setExperience(profile.getExperience() + OWA.experienceZombieAmount);
-			System.out.println(profile.getZombieKills());
+			if(p != null) {
+				PlayerProfile profile = PlayerProfile.getProfileFromPlayer(p.getUniqueId());
+				profile.setZombieKills(profile.getZombieKills() + 1);
+				profile.setExperience(profile.getExperience() + OWA.experienceZombieAmount);
+				profile.updateZombieKillScoreboard();
+				profile.updateExperienceScoreboard();
+				System.out.println(profile.getZombieKills());
+			}
+			
 		}
 	}
 	
@@ -36,11 +41,14 @@ public class PlayerChangeStatsListener implements Listener {
 	public void onPlayerKillOtherPlayerEvent(PlayerDeathEvent event) {
 		PlayerProfile deathProfile = PlayerProfile.getProfileFromPlayer(event.getEntity().getUniqueId());
 		deathProfile.setDeaths(deathProfile.getDeaths() + 1);
+		deathProfile.updatePlayerDeathScoreboard();
 		System.out.println(deathProfile.getDeaths());
 		
 		PlayerProfile profile = PlayerProfile.getProfileFromPlayer(event.getEntity().getKiller().getUniqueId());
 		profile.setPlayerKills(profile.getPlayerKills() + 1);
 		profile.setExperience(profile.getExperience() + OWA.experiencePlayerAmount);
+		profile.updatePlayerKillScoreboard();
+		profile.updateExperienceScoreboard();
 		System.out.println(profile.getPlayerKills());
 		
 		

@@ -49,7 +49,8 @@ public class TemperatureChangeEvent extends Event {
 					this.profile.getTemperature() - reason.getAmount() : 0);
 			this.profile.getTemperatureBar().setProgress(this.profile.getTemperature()/20d);
 		}
-			
+		
+		this.profile.updateTempScoreboard();
 		
 		
 		if(this.profile.getTemperature() <= OWA.temperatureLow) {

@@ -28,7 +28,8 @@ public class PlayerRespawnListener implements Listener {
 		profile.setTemperature(profile.getMaxTemperature()/2);
 		profile.getTemperatureBar().setColor(BarColor.WHITE);
 		profile.getTemperatureBar().setProgress(0.5d);
-		
+		profile.updateThirstScoreboard();
+		profile.updateTempScoreboard();
 		if(!profile.getCampfires().isEmpty()) {
 			
 			event.setRespawnLocation(profile.getCampfires().get(OWA.random.nextInt(profile.getCampfires().size())).getLoc().get(profile.getPlayerUUID()));

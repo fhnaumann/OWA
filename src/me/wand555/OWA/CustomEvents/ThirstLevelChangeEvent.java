@@ -43,6 +43,8 @@ public class ThirstLevelChangeEvent extends Event {
 			this.profile.getThirstBar().setProgress(this.profile.getThirst()/20d);
 		}
 		
+		this.profile.updateThirstScoreboard();
+		
 		//low
 		if(!storeHadLowPotionsBefore.containsKey(player.getUniqueId())) {
 			if(profile.getThirst() <= OWA.thirstLow) {

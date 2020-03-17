@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 import me.wand555.OWA.Commands.CE;
 import me.wand555.OWA.Listener.AdminAreaListener;
@@ -150,9 +151,10 @@ public class OWA extends JavaPlugin {
 		new PlayerChangeStatsListener(this);
 		
 		//check if tickrate in config is the same for temperature and thirst, then put both in the same
-		//new ThirstTimer(this, thirstLowEffect, thirstVeryLowEffect).runTaskTimer(this, 0L, thirstTickrate+20L);
-		//new DetectTemperature(this, temperatureVeryLowEffect, temperaturetLowEffect, temperatureHighEffect, temperatureVeryHighEffect).runTaskTimer(this, 0L, OWA.temperatureTickrate);
+		new ThirstTimer(this, thirstLowEffect, thirstVeryLowEffect).runTaskTimer(this, 0L, thirstTickrate+20L);
+		new DetectTemperature(this, temperatureVeryLowEffect, temperaturetLowEffect, temperatureHighEffect, temperatureVeryHighEffect).runTaskTimer(this, 0L, OWA.temperatureTickrate);
 		//new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
+		
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			new PlayerProfile(p);
