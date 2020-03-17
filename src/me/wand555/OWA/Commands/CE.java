@@ -212,12 +212,18 @@ public class CE implements CommandExecutor {
 									p.sendMessage("You're already setting an area!");
 								}
 								else {
-									profile.setAreaSetting(true);
-									profile.setType(AdminAreaType.ZOMBIE_CAMP);
-									profile.setSpawnAmount(Integer.valueOf(args[2]));
-									profile.setTickrate(Long.valueOf(args[3]));
-									p.getInventory().addItem(OWA.hoeItem);
-									p.sendMessage("Click the bounds with this item!");
+									if(StringUtils.isNumeric(args[2]) && StringUtils.isNumeric(args[3])) {
+										profile.setAreaSetting(true);
+										profile.setType(AdminAreaType.ZOMBIE_CAMP);
+										profile.setSpawnAmount(Integer.valueOf(args[2]));
+										profile.setTickrate(Long.valueOf(args[3]));
+										p.getInventory().addItem(OWA.hoeItem);
+										p.sendMessage("Click the bounds with this item!");
+									}
+									else {
+										p.sendMessage("last two parameters have to be numbers");
+									}
+									
 								}
 							}
 							else {

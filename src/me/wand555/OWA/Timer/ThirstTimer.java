@@ -38,13 +38,13 @@ public class ThirstTimer extends BukkitRunnable {
 			//checks if player is online
 			if(Bukkit.getPlayer(entry.getKey()) != null) {
 				Player p = Bukkit.getPlayer(entry.getKey());
-				
-				if(p.hasPermission("owa.thirst.pass")) { //NOT NICHT VERGESSEN (!)
-					plugin.getServer().getPluginManager().callEvent(new ThirstLevelChangeEvent(p, ThirstLevelChangeReason.TIME, 
-							onLowEffects, onVeryLowEffects));
-					
+				if(!p.isDead()) {
+					if(p.hasPermission("owa.thirst.pass")) { //NOT NICHT VERGESSEN (!)
+						plugin.getServer().getPluginManager().callEvent(new ThirstLevelChangeEvent(p, ThirstLevelChangeReason.TIME, 
+								onLowEffects, onVeryLowEffects));
+						
+					}
 				}
-			
 			}
 		}
 	}

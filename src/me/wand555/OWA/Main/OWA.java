@@ -73,8 +73,6 @@ public class OWA extends JavaPlugin {
 	public static int zombieSpawnOuterBound;
 	public static int zombieSpawnAmount;
 	public static int zombieSpawnTickrate;
-	public static int adminAreaSpawnAmount;
-	public static long adminAreaSpawnTickrate;
 	public static int experienceZombieAmount;
 	public static int experiencePlayerAmount;
 	
@@ -109,8 +107,6 @@ public class OWA extends JavaPlugin {
 		zombieSpawnOuterBound = this.getConfig().getInt("Zombie.Spawn.OuterBound");
 		zombieSpawnAmount = this.getConfig().getInt("Zombie.Spawn.Amount");
 		zombieSpawnTickrate = this.getConfig().getInt("Zombie.Spawn.TickRate");
-		adminAreaSpawnAmount = this.getConfig().getInt("Admin.Setzone.Spawn.Amount");
-		adminAreaSpawnTickrate = this.getConfig().getLong("Admin.Setzone.Spawn.TickRate");
 		
 		ArrayList<PotionEffect> thirstLowEffect = this.deserializePotionEffects("Thirst.Low.Effects");
 		ArrayList<PotionEffect> thirstVeryLowEffect = this.deserializePotionEffects("Thirst.Very_Low.Effects");
@@ -151,9 +147,9 @@ public class OWA extends JavaPlugin {
 		new PlayerChangeStatsListener(this);
 		
 		//check if tickrate in config is the same for temperature and thirst, then put both in the same
-		new ThirstTimer(this, thirstLowEffect, thirstVeryLowEffect).runTaskTimer(this, 0L, thirstTickrate+20L);
-		new DetectTemperature(this, temperatureVeryLowEffect, temperaturetLowEffect, temperatureHighEffect, temperatureVeryHighEffect).runTaskTimer(this, 0L, OWA.temperatureTickrate);
-		//new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
+		new ThirstTimer(this, thirstLowEffect, thirstVeryLowEffect).runTaskTimer(this, thirstTickrate, thirstTickrate);
+		new DetectTemperature(this, temperatureVeryLowEffect, temperaturetLowEffect, temperatureHighEffect, temperatureVeryHighEffect).runTaskTimer(this, temperatureTickrate, temperatureTickrate);
+		new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
 		
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
@@ -185,18 +181,15 @@ public class OWA extends JavaPlugin {
 		
 		this.getConfig().addDefault("Experience.Zombie.Amount", 1);
 		this.getConfig().addDefault("Experience.Player.Amount", 20);
-		this.getConfig().addDefault("Admin.Setzone.Spawn.Amount", 10);
-		this.getConfig().addDefault("Admin.Setzone.Spawn.TickRate", 20);
 		this.getConfig().addDefault("Campfire.setwarp_Radius", 5);
-		this.getConfig().addDefault("Zombie.Spawn.InnerBound", 5);
-		this.getConfig().addDefault("Zombie.Spawn.OuterBound", 50);
-		this.getConfig().addDefault("Zombie.Spawn.Amount", 10);
-		this.getConfig().addDefault("Zombie.Spawn.TickRate", 20*60*2);
-		this.getConfig().addDefault("Zombie.ExtremeMobSpawn", true);
-		this.getConfig().addDefault("Thirst.Refill.Range", 4);
+		this.getConfig().addDefault("Zombie.Spawn.InnerBound", 10);
+		this.getConfig().addDefault("Zombie.Spawn.OuterBound", 100);
+		this.getConfig().addDefault("Zombie.Spawn.Amount", 30);
+		this.getConfig().addDefault("Zombie.Spawn.TickRate", 20*60);
+		this.getConfig().addDefault("Thirst.Refill.Range", 3);
 		this.getConfig().addDefault("Thirst.Damage.Tickrate", 20);
-		this.getConfig().addDefault("Thirst.Damage.Amount", 1);
-		this.getConfig().addDefault("Thirst.Tickrate", 20);
+		this.getConfig().addDefault("Thirst.Damage.Amount", 2);
+		this.getConfig().addDefault("Thirst.Tickrate", 20*60);
 		this.getConfig().addDefault("Thirst.Low.Value", 7);
 		this.getConfig().addDefault("Thirst.Low.Effects", Arrays.asList(
 				serializePotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*20, 1, false, false, false), false, false, false),
@@ -207,7 +200,7 @@ public class OWA extends JavaPlugin {
 		this.getConfig().addDefault("Temperature.Day.Begin", 167);
 		this.getConfig().addDefault("Temperature.Day.End", 11834);
 		this.getConfig().addDefault("Temperature.Range.Check", 2);
-		this.getConfig().addDefault("Temperature.Tickrate", 40);
+		this.getConfig().addDefault("Temperature.Tickrate", 20*60);
 		this.getConfig().addDefault("Temperature.In_Water_Light_Level", 10);
 		
 		this.getConfig().addDefault("Temperature.Low.Value", 7);
@@ -219,7 +212,7 @@ public class OWA extends JavaPlugin {
 				serializePotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20*20, 2, false, false, false), false, false, false),
 				serializePotionEffect(new PotionEffect(PotionEffectType.POISON, 20*20, 2, false, false, false), false, false, false)));
 		
-		this.getConfig().addDefault("Temperature.High.Value", 13);
+		this.getConfig().addDefault("Temperature.High.Value", 14);
 		this.getConfig().addDefault("Temperature.High.Effects", Arrays.asList(
 				serializePotionEffect(new PotionEffect(PotionEffectType.SLOW, 20*20, 1, false, false, false), false, false, false),
 				serializePotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20*20, 1, false, false, false), false, false, false)));

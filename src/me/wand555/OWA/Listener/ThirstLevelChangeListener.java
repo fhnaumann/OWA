@@ -30,11 +30,6 @@ public class ThirstLevelChangeListener implements Listener {
 		this.plugin = (OWA) plugin;
 	}
 	
-	@EventHandler
-	public void onThirstLevelChangeEvent(ThirstLevelChangeEvent event) {
-		System.out.println(event.getNewThirst());
-	}
-	
 	
 	@EventHandler
 	public void onRedirectFromWatterBottleEvent(PlayerItemConsumeEvent event) {

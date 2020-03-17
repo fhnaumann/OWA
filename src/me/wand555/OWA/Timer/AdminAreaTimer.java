@@ -20,16 +20,18 @@ import me.wand555.OWA.Main.OWA;
 public class AdminAreaTimer extends BukkitRunnable {
 
 	private ArrayList<Location> area;
+	private int amount;
 	
-	public AdminAreaTimer(ArrayList<Location> area) {
+	public AdminAreaTimer(ArrayList<Location> area, int amount) {
 		this.area = area;
+		this.amount = amount;
 	}
 
 	@Override
 	public void run() {
 		
 		outerloop:
-		for(int j=0; j<OWA.adminAreaSpawnAmount; j++) {
+		for(int j=0; j<amount; j++) {
 			Location rLoc = area.get(ThreadLocalRandom.current().nextInt(0, area.size()));
 			
 			if(rLoc.getBlock().getType() == Material.AIR) {

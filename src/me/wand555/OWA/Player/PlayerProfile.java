@@ -53,7 +53,7 @@ public class PlayerProfile {
 	 */
 	public PlayerProfile(Player p) {
 		this.playerUUID = p.getUniqueId();
-		this.thirst = 10;
+		this.thirst = 20;
 		this.maxThirst = 20;
 		this.thirstBar = Bukkit.createBossBar("Thirst", BarColor.BLUE, BarStyle.SEGMENTED_20);
 		if(p.hasPermission("owa.thirst")) this.thirstBar.addPlayer(p);
@@ -94,7 +94,7 @@ public class PlayerProfile {
 	}
 	
 	public void updatePlayerDeathScoreboard() {
-		board.getTeam("playerDeath").setSuffix(ChatColor.GOLD + Integer.toString(getDeaths()));
+		board.getTeam("playerDeath1").setSuffix(ChatColor.GOLD + Integer.toString(getDeaths()));
 	}
 	
 	public void updateExperienceScoreboard() {
@@ -136,7 +136,7 @@ public class PlayerProfile {
 		playerKill.addEntry(ChatColor.DARK_AQUA.toString());
 		objective.getScore(ChatColor.DARK_AQUA.toString()).setScore(12);
 		
-		Team playerDeath = board.registerNewTeam("playerDeath");
+		Team playerDeath = board.registerNewTeam("playerDeath1");
 		playerDeath.setPrefix("Player Death: ");
 		playerDeath.setSuffix(ChatColor.GOLD + Integer.toString(getDeaths()));
 		playerDeath.addEntry(ChatColor.DARK_BLUE.toString());
@@ -329,7 +329,6 @@ public class PlayerProfile {
 	public void playerDeath(Player p) {
 		p.getActivePotionEffects().forEach(e -> p.removePotionEffect(e.getType()));
 		p.setHealth(0);
-		this.setDeaths(this.getDeaths()+1);
 		//rest is called on respawn event to avoid people stalling on death screen
 	}
 

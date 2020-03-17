@@ -45,12 +45,7 @@ public class AdminArea {
 		
 		p.sendMessage("Finished storing blocks");
 		//neue Runnable
-		if(type == AdminAreaType.ZOMBIE_CAMP) {
-			runningTask = new AdminAreaTimer(area).runTaskTimer(OWA.getPlugin(OWA.class), OWA.adminAreaSpawnTickrate, OWA.adminAreaSpawnTickrate);
-		}
-		else {
-			runningTask = null;
-		}
+		runningTask = null;
 		area.stream().forEachOrdered(l -> System.out.println(l.getBlockX() + "/" + l.getBlockY() + "/" + l.getBlockZ()));
 		adminAreas.add(this);
 	}
@@ -86,7 +81,7 @@ public class AdminArea {
 		p.sendMessage("Finished storing blocks");
 		//neue Runnable
 		if(type == AdminAreaType.ZOMBIE_CAMP) {
-			runningTask = new AdminAreaTimer(area).runTaskTimer(OWA.getPlugin(OWA.class), amount, tickrate);
+			runningTask = new AdminAreaTimer(area, amount).runTaskTimer(OWA.getPlugin(OWA.class), tickrate, tickrate);
 		}
 		else {
 			runningTask = null;

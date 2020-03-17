@@ -42,15 +42,14 @@ public class PlayerChangeStatsListener implements Listener {
 		PlayerProfile deathProfile = PlayerProfile.getProfileFromPlayer(event.getEntity().getUniqueId());
 		deathProfile.setDeaths(deathProfile.getDeaths() + 1);
 		deathProfile.updatePlayerDeathScoreboard();
-		System.out.println(deathProfile.getDeaths());
 		
-		PlayerProfile profile = PlayerProfile.getProfileFromPlayer(event.getEntity().getKiller().getUniqueId());
-		profile.setPlayerKills(profile.getPlayerKills() + 1);
-		profile.setExperience(profile.getExperience() + OWA.experiencePlayerAmount);
-		profile.updatePlayerKillScoreboard();
-		profile.updateExperienceScoreboard();
-		System.out.println(profile.getPlayerKills());
-		
-		
+		if(event.getEntity().getKiller() != null) {
+			PlayerProfile profile = PlayerProfile.getProfileFromPlayer(event.getEntity().getKiller().getUniqueId());
+			profile.setPlayerKills(profile.getPlayerKills() + 1);
+			profile.setExperience(profile.getExperience() + OWA.experiencePlayerAmount);
+			profile.updatePlayerKillScoreboard();
+			profile.updateExperienceScoreboard();
+			System.out.println(profile.getPlayerKills());
+		}		
 	}
 }

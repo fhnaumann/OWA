@@ -85,7 +85,7 @@ public class DaylightZombieSpawning extends BukkitRunnable {
 										//spawn mob here (at 'l')
 										Zombie zombie = (Zombie) w.spawnEntity(l.getBlock().getRelative(BlockFace.UP).getLocation(), EntityType.ZOMBIE);
 										zombie.setRemoveWhenFarAway(true);
-										//System.out.println(l.getBlockX() + " ABC  " + l.getBlockZ());
+										System.out.println(l.getBlockX() + " ABC  " + l.getBlockZ());
 										continue outerloop;
 									}
 									i--;
@@ -108,7 +108,7 @@ public class DaylightZombieSpawning extends BukkitRunnable {
 										//spawn mob
 										Zombie zombie = (Zombie) w.spawnEntity(l, EntityType.ZOMBIE);
 										zombie.setRemoveWhenFarAway(true);
-										//System.out.println(l.getBlockX() + " DEF  " + l.getBlockZ());
+										System.out.println(l.getBlockX() + " DEF  " + l.getBlockZ());
 										continue outerloop;
 									}
 									i++;
