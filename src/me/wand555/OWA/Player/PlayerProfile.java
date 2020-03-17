@@ -216,7 +216,8 @@ public class PlayerProfile {
 
 
 	public int getKills() {
-		return kills;
+		this.kills = getPlayerKills() + getZombieKills();
+		return this.kills;
 	}
 
 

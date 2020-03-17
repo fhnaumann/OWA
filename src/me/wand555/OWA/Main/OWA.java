@@ -27,11 +27,14 @@ import me.wand555.OWA.Commands.CE;
 import me.wand555.OWA.Listener.AdminAreaListener;
 import me.wand555.OWA.Listener.AdminChangeWorldWhileSettingAreaListener;
 import me.wand555.OWA.Listener.AdminDropSettingItemOrDeathListener;
+import me.wand555.OWA.Listener.AdminLootChestListener;
 import me.wand555.OWA.Listener.CampfireListener;
 import me.wand555.OWA.Listener.CauldronBottleRefillListener;
 import me.wand555.OWA.Listener.DisableZombieBurningListener;
 import me.wand555.OWA.Listener.FenceJumpListener;
 import me.wand555.OWA.Listener.LeashRightClickListener;
+import me.wand555.OWA.Listener.PlayerChangeStatsListener;
+import me.wand555.OWA.Listener.PlayerFindLootChestListener;
 import me.wand555.OWA.Listener.PlayerLoginListener;
 import me.wand555.OWA.Listener.PlayerRespawnListener;
 import me.wand555.OWA.Listener.ThirstLevelChangeListener;
@@ -71,14 +74,19 @@ public class OWA extends JavaPlugin {
 	public static int zombieSpawnTickrate;
 	public static int adminAreaSpawnAmount;
 	public static long adminAreaSpawnTickrate;
+	public static int experienceZombieAmount;
+	public static int experiencePlayerAmount;
 	
 	public static final Random random = new Random();
 	public static ItemStack hoeItem;
+	public static ItemStack shovelItem;
 	
 	public void onEnable() {
 		plugin = this;
 		loadDefaultConfig();
 		
+		experienceZombieAmount = this.getConfig().getInt("Experience.Zombie.Amount");
+		experiencePlayerAmount = this.getConfig().getInt("Experience.Player.Amount");
 		campfireSetwarpRadius = this.getConfig().getInt("Campfire.setwarp_Radius");
 		extremeMobSpawn = this.getConfig().getBoolean("ExtremeMobSpawn");
 		thirstTickrate = this.getConfig().getLong("Thirst.Tickrate");
@@ -111,11 +119,20 @@ public class OWA extends JavaPlugin {
 		ArrayList<PotionEffect> temperatureHighEffect = this.deserializePotionEffects("Temperature.High.Effects");
 		ArrayList<PotionEffect> temperatureVeryHighEffect = this.deserializePotionEffects("Temperature.Very_High.Effects");
 		
-		hoeItem = new ItemStack(Material.DIAMOND_HOE);
-		ItemMeta meta = hoeItem.getItemMeta();
-		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, false);
-		hoeItem.setItemMeta(meta);
+		{
+			hoeItem = new ItemStack(Material.DIAMOND_HOE);
+			ItemMeta meta = hoeItem.getItemMeta();
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, false);
+			hoeItem.setItemMeta(meta);
+		}
+		{
+			shovelItem = new ItemStack(Material.DIAMOND_SHOVEL);
+			ItemMeta meta = shovelItem.getItemMeta();
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, false);
+			shovelItem.setItemMeta(meta);
+		}
 		
 		new PlayerLoginListener(this);
 		new DisableZombieBurningListener(this);
@@ -128,15 +145,19 @@ public class OWA extends JavaPlugin {
 		new AdminAreaListener(this);
 		new AdminChangeWorldWhileSettingAreaListener(this);
 		new AdminDropSettingItemOrDeathListener(this);
+		new AdminLootChestListener(this);
+		new PlayerFindLootChestListener(this);
+		new PlayerChangeStatsListener(this);
 		
 		//check if tickrate in config is the same for temperature and thirst, then put both in the same
 		//new ThirstTimer(this, thirstLowEffect, thirstVeryLowEffect).runTaskTimer(this, 0L, thirstTickrate+20L);
 		//new DetectTemperature(this, temperatureVeryLowEffect, temperaturetLowEffect, temperatureHighEffect, temperatureVeryHighEffect).runTaskTimer(this, 0L, OWA.temperatureTickrate);
-		new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
+		//new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			new PlayerProfile(p);
-			if(p.hasPermission("owa.admin.setzone") || p.hasPermission("owa.admin.setchest")) {
+			if(p.hasPermission("owa.admin.setzone") || p.hasPermission("owa.admin.setchest")
+					|| p.hasPermission("owa.admin.lootchest.manage")) {
 				System.out.println("assigned admin profile");
 				new AdminProfile(p.getUniqueId());
 			}
@@ -148,6 +169,7 @@ public class OWA extends JavaPlugin {
 		this.getCommand("delwarp").setExecutor(myCE);
 		this.getCommand("setzone").setExecutor(myCE);
 		this.getCommand("removezone").setExecutor(myCE);
+		this.getCommand("manageloot").setExecutor(myCE);
 		
 		
 	}
@@ -159,6 +181,8 @@ public class OWA extends JavaPlugin {
 	private void loadDefaultConfig() {
 		this.getConfig().options().copyDefaults(true);
 		
+		this.getConfig().addDefault("Experience.Zombie.Amount", 1);
+		this.getConfig().addDefault("Experience.Player.Amount", 20);
 		this.getConfig().addDefault("Admin.Setzone.Spawn.Amount", 10);
 		this.getConfig().addDefault("Admin.Setzone.Spawn.TickRate", 20);
 		this.getConfig().addDefault("Campfire.setwarp_Radius", 5);

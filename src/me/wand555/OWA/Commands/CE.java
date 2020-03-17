@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,6 +21,7 @@ import me.wand555.OWA.Main.OWA;
 import me.wand555.OWA.Player.AdminArea;
 import me.wand555.OWA.Player.AdminProfile;
 import me.wand555.OWA.Player.Campfire;
+import me.wand555.OWA.Player.LootChest;
 import me.wand555.OWA.Player.PlayerProfile;
 import me.wand555.OWA.Timer.AdminAreaTimer;
 
@@ -258,14 +260,53 @@ public class CE implements CommandExecutor {
 				}
 			}
 			else if(cmd.getName().equalsIgnoreCase("manageloot")) {
-				if(args.length == 1) {
-					
-					//give player shovel
-					// /manageloot <Optional: Number>
-					//each loot chest has a name
-					//left click == destroy loot
-					//right click == set loot
+				if(p.hasPermission("owa.admin.lootchest.manage")) {
+					AdminProfile profile = AdminProfile.getAdminProfileFromUUID(p.getUniqueId());
+					if(profile.isLootChestSetting()) {
+						//take away shovel, disable it
+						p.getInventory().removeItem(OWA.shovelItem);
+						profile.setLootChestSetting(false);
+						profile.setLootChestName(null);
+						profile.setLootChestReturnTickrate(0);
+						p.sendMessage("Left manageloot-mode");
+						return true;
+					}
+					if(args.length == 0) {
+						
+						//give player shovel
+						// /manageloot <Optional: TimeInH>
+						//each loot chest has a name
+						//left click == destroy loot
+						//right click == set loot
+						p.sendMessage("Left Click chest to remove this lootchest.");
+						p.getInventory().addItem(OWA.shovelItem);
+						profile.setLootChestSetting(true);
+						p.sendMessage("Run this command again to leave manageloot-mode");
+						
+					}
+					else if(args.length == 2) {
+						if(StringUtils.isNumeric(args[1])) {
+							p.sendMessage("Left Click chest to remove this lootchest. Right click to make it a lootchest.");
+							p.getInventory().addItem(OWA.shovelItem);
+							profile.setLootChestSetting(true);
+							profile.setLootChestName(args[0]);
+							profile.setLootChestReturnTickrate(Integer.valueOf(args[1]));
+							p.sendMessage("Run this command again to leave manageloot-mode");
+							// /manageloot <Optional: TimeInH>
+							//each loot chest has a name
+							//left click == destroy loot
+							//right click == set loot
+							
+						}
+						else {
+							p.sendMessage("Is no number");
+						}
+					}
+					else {
+						p.sendMessage("Syntax: ");
+					}
 				}
+				
 			}
 		}
 		else {

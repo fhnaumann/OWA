@@ -24,7 +24,9 @@ public class AdminProfile {
 	private String name = null;
 	private int spawnAmount = 0;
 	private long tickrate = 0;
-	private ArrayList<LootChest> lootChests;
+	private ArrayList<LootChest> lootChests = new ArrayList<LootChest>();
+	private String lootChestName = null;
+	private int lootChestReturnTickrate = 0;
 	
 	public AdminProfile(UUID uuid) {
 		this.adminUUID = uuid;
@@ -163,5 +165,40 @@ public class AdminProfile {
 	 */
 	public void setTickrate(long tickrate) {
 		this.tickrate = tickrate;
+	}
+
+	/**
+	 * @return the lootChests
+	 */
+	public ArrayList<LootChest> getLootChests() {
+		return lootChests;
+	}
+
+	/**
+	 * @return the lootChestName
+	 */
+	public String getLootChestName() {
+		return lootChestName;
+	}
+
+	/**
+	 * @param lootChestName the lootChestName to set
+	 */
+	public void setLootChestName(String lootChestName) {
+		this.lootChestName = lootChestName;
+	}
+
+	/**
+	 * @return the lootChestReturnTickrate
+	 */
+	public int getLootChestReturnTickrate() {
+		return lootChestReturnTickrate;
+	}
+
+	/**
+	 * @param lootChestReturnTickrate the lootChestReturnTickrate to set
+	 */
+	public void setLootChestReturnTickrate(int lootChestReturnTickrate) {
+		this.lootChestReturnTickrate = lootChestReturnTickrate;
 	}
 }

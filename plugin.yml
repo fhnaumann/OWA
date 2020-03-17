@@ -32,6 +32,7 @@ commands:
     usage: /removezone <uniqueName>
     description: Removes zone from given name.
     permission: owa.admin.zone.remove
-  setloot:
-    usage. /setloot <time>
-    description: Sets up a loot chest. Refills after <time> amount. If time == 0 it is one time only.
+  manageloot:
+    usage: /manageloot (Optional) <name> (Optional) <time>
+    description: Sets up a loot chest. Refills after <time> amount. If time == 0 it is one time only. If no time is entered it will delete the chest.
+    permission: owa.admin.lootchest.manage
