@@ -1,5 +1,6 @@
 package me.wand555.OWA.Main;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +26,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.ScoreboardManager;
 
 import me.wand555.OWA.Commands.CE;
+import me.wand555.OWA.Config.HandleRestart;
 import me.wand555.OWA.Listener.AdminAreaListener;
 import me.wand555.OWA.Listener.AdminChangeWorldWhileSettingAreaListener;
 import me.wand555.OWA.Listener.AdminDropSettingItemOrDeathListener;
@@ -37,6 +39,7 @@ import me.wand555.OWA.Listener.LeashRightClickListener;
 import me.wand555.OWA.Listener.PlayerChangeStatsListener;
 import me.wand555.OWA.Listener.PlayerFindLootChestListener;
 import me.wand555.OWA.Listener.PlayerLoginListener;
+import me.wand555.OWA.Listener.PlayerPlaceChestNextToLootChestListener;
 import me.wand555.OWA.Listener.PlayerRespawnListener;
 import me.wand555.OWA.Listener.ThirstLevelChangeListener;
 import me.wand555.OWA.Player.AdminProfile;
@@ -50,9 +53,15 @@ public class OWA extends JavaPlugin {
 
 	public static final String PREFIX = "[OWA]";
 	
+    // Reset
+    public static final String RESET = "\033[0m";  // Text Reset
+
+    // Regular Colors
+    public static final String RED = "\033[0;31m";     // RED
+	
+    public static boolean isValid;
 	private CE myCE;
 	private OWA plugin;
-	public static boolean extremeMobSpawn;
 	public static long thirstTickrate;
 	public static int thirstLow;
 	public static int thirstVeryLow;
@@ -81,16 +90,22 @@ public class OWA extends JavaPlugin {
 	public static ItemStack shovelItem;
 	
 	public void onEnable() {
+		isValid = true;
 		plugin = this;
 		loadDefaultConfig();
 		
 		experienceZombieAmount = this.getConfig().getInt("Experience.Zombie.Amount");
 		experiencePlayerAmount = this.getConfig().getInt("Experience.Player.Amount");
 		campfireSetwarpRadius = this.getConfig().getInt("Campfire.setwarp_Radius");
-		extremeMobSpawn = this.getConfig().getBoolean("ExtremeMobSpawn");
+		if(campfireSetwarpRadius <= 0) throwException("'Campfire.setwarp_Radius' has to be greater than 0!");
 		thirstTickrate = this.getConfig().getLong("Thirst.Tickrate");
+		if(thirstTickrate <= 0) throwException("'Thirst.Tickrate' has to be greater than 0!");
 		thirstLow = this.getConfig().getInt("Thirst.Low.Value");
+		if(thirstLow <= 0) throwException("'Thirst.Low.Value' has to be greater than 0!");
 		thirstVeryLow = this.getConfig().getInt("Thirst.Very_Low.Value");
+		if(thirstVeryLow <= 0) throwException("'Thirst.Very_Low.Value' has to be greater than 0!");
+		if(thirstVeryLow >= thirstLow) throwException("'Thirst.Very_Low.Value' has to be smaller than 'Thirst.Low.Value'!");
+		
 		thirstRefillRange = this.getConfig().getInt("Thirst.Refill.Range");
 		temperatureDayBegin = this.getConfig().getLong("Temperature.Day.Begin");
 		temperatureDayEnd = this.getConfig().getLong("Temperature.Day.End");
@@ -131,6 +146,9 @@ public class OWA extends JavaPlugin {
 			shovelItem.setItemMeta(meta);
 		}
 		
+		//load here
+		HandleRestart.loadFromConfig();
+		
 		new PlayerLoginListener(this);
 		new DisableZombieBurningListener(this);
 		new LeashRightClickListener(this);
@@ -145,13 +163,14 @@ public class OWA extends JavaPlugin {
 		new AdminLootChestListener(this);
 		new PlayerFindLootChestListener(this);
 		new PlayerChangeStatsListener(this);
+		new PlayerPlaceChestNextToLootChestListener(this);
 		
 		//check if tickrate in config is the same for temperature and thirst, then put both in the same
 		new ThirstTimer(this, thirstLowEffect, thirstVeryLowEffect).runTaskTimer(this, thirstTickrate, thirstTickrate);
 		new DetectTemperature(this, temperatureVeryLowEffect, temperaturetLowEffect, temperatureHighEffect, temperatureVeryHighEffect).runTaskTimer(this, temperatureTickrate, temperatureTickrate);
-		new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
+		//new DaylightZombieSpawning(this).runTaskTimer(this, zombieSpawnTickrate, zombieSpawnTickrate);
 		
-		
+		/*
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			new PlayerProfile(p);
 			if(p.hasPermission("owa.admin.setzone") || p.hasPermission("owa.admin.setchest")
@@ -160,20 +179,44 @@ public class OWA extends JavaPlugin {
 				new AdminProfile(p.getUniqueId());
 			}
 		}
-		
+		*/
 		myCE = new CE(plugin);
 		this.getCommand("setwarp").setExecutor(myCE);
 		this.getCommand("warp").setExecutor(myCE);
 		this.getCommand("delwarp").setExecutor(myCE);
+		this.getCommand("warplist").setExecutor(myCE);
 		this.getCommand("setzone").setExecutor(myCE);
 		this.getCommand("removezone").setExecutor(myCE);
 		this.getCommand("manageloot").setExecutor(myCE);
+		this.getCommand("zonelist").setExecutor(myCE);
+		this.getCommand("lootchestlist").setExecutor(myCE);
+		this.getCommand("owareload").setExecutor(myCE);
+		
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			if(p.isOp() 
+					|| p.hasPermission("owa.admin.zone.set") 
+					|| p.hasPermission("owa.admin.zone.remove")
+					|| p.hasPermission("owa.admin.lootchest.manage")) {
+				new AdminProfile(p.getUniqueId());
+				System.out.println("created new admin profile");
+			}
+		}
 		
 		
+		
+		if(!isValid) plugin.getServer().getPluginManager().disablePlugin(this);
 	}
 	
 	public void onDisable() {
-		
+		HandleRestart.saveToCustomConfig();
+	}
+	
+	private void throwException(String msg) {
+		System.out.println(RED + msg + RESET);
+		System.out.println(RED + "Change the setting in the config.yml and restart!" + RESET);
+		System.out.println(RED + "Shutting down OWA!" + RESET);
+		isValid = false;
+		//throw new IllegalArgumentException(RED + msg + RESET);
 	}
 	
 	private void loadDefaultConfig() {
@@ -184,8 +227,8 @@ public class OWA extends JavaPlugin {
 		this.getConfig().addDefault("Campfire.setwarp_Radius", 5);
 		this.getConfig().addDefault("Zombie.Spawn.InnerBound", 10);
 		this.getConfig().addDefault("Zombie.Spawn.OuterBound", 100);
-		this.getConfig().addDefault("Zombie.Spawn.Amount", 30);
-		this.getConfig().addDefault("Zombie.Spawn.TickRate", 20*60);
+		this.getConfig().addDefault("Zombie.Spawn.Amount", 100);
+		this.getConfig().addDefault("Zombie.Spawn.TickRate", 20*10);
 		this.getConfig().addDefault("Thirst.Refill.Range", 3);
 		this.getConfig().addDefault("Thirst.Damage.Tickrate", 20);
 		this.getConfig().addDefault("Thirst.Damage.Amount", 2);

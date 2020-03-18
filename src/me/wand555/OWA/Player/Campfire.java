@@ -27,6 +27,17 @@ public class Campfire {
 		
 	}
 	
+	/**
+	 * Used for loading from config. Due to way storing campfires is built, everything else will set after creating the instance.
+	 * Order is: Call this constructor -> call addNewIndividualToAllCampfires method.
+	 * 
+	 * @param campfireLoc
+	 */
+	public Campfire(Location campfireLoc) {
+		this.campfireLoc = campfireLoc;
+		allCampfires.put(campfireLoc, this);
+	}
+	
 	public static boolean hasAnyCampNameDuplicate(PlayerProfile profile, String name) {
 		return allCampfires.entrySet().stream()
 				.anyMatch(entry -> entry.getValue().getName().get(profile.getPlayerUUID()).equalsIgnoreCase(name));

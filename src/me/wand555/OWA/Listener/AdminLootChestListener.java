@@ -9,6 +9,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.wand555.OWA.Config.HandleRestart;
 import me.wand555.OWA.Main.OWA;
 import me.wand555.OWA.Player.AdminProfile;
 import me.wand555.OWA.Player.LootChest;
@@ -53,8 +54,14 @@ public class AdminLootChestListener implements Listener {
 							}
 							else if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
 								if(lootChest != null) {
+									if(lootChest.getReturnLootChest() != null) {
+										lootChest.getReturnLootChest().getCountSecondsPassed().cancel();
+										lootChest.getReturnLootChest().cancel();
+									}
 									LootChest.getLootChests().remove(lootChest);
 									profile.getLootChests().remove(lootChest);
+									
+									
 									//profile.setLootChestName(null);
 									//profile.setLootChestReturnTickrate(0);
 									event.getClickedBlock().setType(Material.AIR);

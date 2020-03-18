@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
@@ -25,17 +26,19 @@ public class LootChest {
 
 	private static ArrayList<LootChest> lootChests = new ArrayList<LootChest>();
 	
-	private UUID creator;
 	private Location chestLoc;
 	private BlockFace facing;
 	private String name;
 	private boolean isLooted;
 	private long timer;
-	private BukkitTask runningTask;
+	private ReturnLootChest returnLootChest;
 	private ArrayList<ItemStack> contents = new ArrayList<ItemStack>();
 	//timer is in hours, have to match to ticks now
 	public LootChest(Location chestLoc, ItemStack[] contents, String name, int timer) {
 		this.chestLoc = chestLoc;
+		if(!(chestLoc.getBlock().getState() instanceof Chest)) {
+			chestLoc.getBlock().setType(Material.CHEST);
+		}
 		this.facing = ((Directional) chestLoc.getBlock().getBlockData()).getFacing();
 		this.name = name;
 		this.isLooted = false;
@@ -49,18 +52,11 @@ public class LootChest {
 		for(ItemStack i : this.contents) {
 			if(i != null) System.out.println(i);
 		}
-		this.setRunningTask(null);
+		this.setReturnLootChest(null);
 		Chest chest = (Chest) chestLoc.getBlock().getState();
 		chest.setCustomName(name);
 		
 		lootChests.add(this);
-	}
-
-	/**
-	 * @return the creator
-	 */
-	public UUID getCreator() {
-		return creator;
 	}
 
 	/**
@@ -94,15 +90,15 @@ public class LootChest {
 	/**
 	 * @return the runningTask
 	 */
-	public BukkitTask getRunningTask() {
-		return runningTask;
+	public ReturnLootChest getReturnLootChest() {
+		return returnLootChest;
 	}
 
 	/**
 	 * @param runningTask the runningTask to set
 	 */
-	public void setRunningTask(BukkitTask runningTask) {
-		this.runningTask = runningTask;
+	public void setReturnLootChest(ReturnLootChest returnLootChest) {
+		this.returnLootChest = returnLootChest;
 	}
 
 	/**

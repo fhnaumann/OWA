@@ -1,5 +1,6 @@
 package me.wand555.OWA.Commands;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import me.wand555.OWA.Config.HandleRestart;
 import me.wand555.OWA.Main.AdminAreaType;
 import me.wand555.OWA.Main.OWA;
 import me.wand555.OWA.Player.AdminArea;
@@ -214,6 +217,7 @@ public class CE implements CommandExecutor {
 								else {
 									if(StringUtils.isNumeric(args[2]) && StringUtils.isNumeric(args[3])) {
 										profile.setAreaSetting(true);
+										profile.setName(args[0]);
 										profile.setType(AdminAreaType.ZOMBIE_CAMP);
 										profile.setSpawnAmount(Integer.valueOf(args[2]));
 										profile.setTickrate(Long.valueOf(args[3]));
@@ -313,6 +317,42 @@ public class CE implements CommandExecutor {
 					}
 				}
 				
+			}
+			else if(cmd.getName().equalsIgnoreCase("zonelist")) {
+				if(args.length == 0) {
+					p.sendMessage("--------Admin Areas--------");
+					AdminArea.getAdminAreas().stream().forEach(a -> {
+						p.sendMessage(a.getName() + " by " + Bukkit.getOfflinePlayer(a.getCreator()).getName() + " (" + a.getType() + ")");
+					});
+				}
+			}
+			else if(cmd.getName().equalsIgnoreCase("lootchestlist")) {
+				if(args.length == 0) {
+					p.sendMessage("--------Loot Chests--------");
+					LootChest.getLootChests().stream().forEach(l -> {
+						p.sendMessage("At " + l.getChestLoc().getBlockX() + "/" + l.getChestLoc().getBlockY() + "/" 
+							+ l.getChestLoc().getBlockZ() + " in " + l.getChestLoc().getWorld().getName() + " with the name "
+							+ l.getName() + " and a timer of " + l.getTimer() + "h");
+					});
+				}
+			}
+			else if(cmd.getName().equalsIgnoreCase("owareload")) {
+				if(args.length == 0) {
+					for(Player player : Bukkit.getOnlinePlayers()) {
+						if(player.isOp() 
+								|| player.hasPermission("owa.admin.zone.set") 
+								|| player.hasPermission("owa.admin.zone.remove")
+								|| player.hasPermission("owa.admin.lootchest.manage")) {
+							
+							if(AdminProfile.getAdminProfileFromUUID(player.getUniqueId()) == null) {
+								new AdminProfile(player.getUniqueId());
+								player.sendMessage("Sucessfully gained permission!");
+								System.out.println("created new admin profile");
+							}		
+						}
+						
+					}
+				}
 			}
 		}
 		else {

@@ -28,11 +28,5 @@ public class ZombieSpawnListener implements Listener {
 				}
 			}
 		}
-		
-		if(OWA.extremeMobSpawn) {
-			if(event.getEntity() instanceof Zombie) {
-				//maybe spawn in even more later;
-			}
-		}	
 	}
 }

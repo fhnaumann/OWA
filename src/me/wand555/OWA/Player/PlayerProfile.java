@@ -24,6 +24,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
+import me.wand555.OWA.Main.OWA;
 import me.wand555.OWA.Main.Perk;
 
 public class PlayerProfile {
@@ -76,6 +77,64 @@ public class PlayerProfile {
 		
 		profiles.put(this.playerUUID, this);
 	}
+	
+	public PlayerProfile(UUID uuid, int thirst, int temp, int zombieKills, int playerKills, int playerDeaths, long experience) {
+		Player p = Bukkit.getPlayer(uuid);
+		System.out.println(p);
+		this.playerUUID = uuid;
+		this.thirst = thirst;
+		this.maxThirst = 20;
+		if(p != null) {
+			this.thirstBar = Bukkit.createBossBar("Thirst", BarColor.BLUE, BarStyle.SEGMENTED_20);
+			this.thirstBar.setProgress(thirst/20d);
+			if(p.hasPermission("owa.thirst")) this.thirstBar.addPlayer(p);
+		}
+		this.temperature = temp;
+		this.maxTemperature = 20;
+		if(p != null) {
+			this.temperatureBar = Bukkit.createBossBar("Temeperature", getFittingColor(), BarStyle.SEGMENTED_20);
+			if(p.hasPermission("owa.temp")) this.temperatureBar.addPlayer(p);		
+			this.temperatureBar.setProgress(this.temperature/20d);
+			
+		}	
+		this.playerKills = playerKills;
+		this.zombieKills = zombieKills;
+		this.deaths = playerDeaths;
+		this.experience = experience;
+		this.perks = new ArrayList<Perk>();
+		this.campfires = new ArrayList<Campfire>();
+		this.board = Bukkit.getScoreboardManager().getNewScoreboard();		
+		loadScoreboard();
+		if(p != null) {
+			p.setScoreboard(board);
+		}	
+		
+		profiles.put(this.playerUUID, this);
+	}
+	
+	public BarColor getFittingColor() {
+		if(this.temperature <= OWA.temperatureLow) {
+			if(this.temperature <= OWA.temperatureVeryLow) {
+				return BarColor.PURPLE;
+			}
+			else {
+				return BarColor.BLUE;
+			}
+		} 
+		else if(this.temperature >= OWA.temperatureHigh) {
+			if(this.temperature >= OWA.temperatureVeryHigh) {
+				return BarColor.RED;
+			}
+			else {
+				return BarColor.YELLOW;
+			}
+		}
+		else {
+			//make white
+			return BarColor.WHITE;
+		}
+	}
+	
 	//RESET THIRST AND TEMP ON DEATH
 	public void updateThirstScoreboard() {
 		board.getTeam("thirst").setSuffix(ChatColor.GOLD + Integer.toString(getThirst()) + ChatColor.GRAY + "/" + ChatColor.GOLD + Integer.toString(getMaxThirst()));
@@ -106,9 +165,9 @@ public class PlayerProfile {
 	}
 	
 	/**
-	 * Call this method, after this.board = ...getNewScoreboard() has been called.
+	 * Call this method, after this.board = ...getNewScoreboard() has been called. Mostly internal use.
 	 */
-	private void loadScoreboard() {
+	public void loadScoreboard() {
 		Objective objective = board.registerNewObjective("stats", "dummy", ChatColor.BOLD + "YOUR STATS");
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 	
@@ -332,6 +391,13 @@ public class PlayerProfile {
 		//rest is called on respawn event to avoid people stalling on death screen
 	}
 
+
+	/**
+	 * @return the board
+	 */
+	public Scoreboard getBoard() {
+		return board;
+	}
 
 	/**
 	 * @return the campfires

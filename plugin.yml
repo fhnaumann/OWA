@@ -1,6 +1,6 @@
 main: me.wand555.OWA.Main.OWA
 name: OWA
-version: 1.15.2
+version: 0.0.3
 description: Test.
 api-version: 1.13
 author: wand555
@@ -22,7 +22,7 @@ commands:
     message: &cYou dont have permission to teleport to a campfire!
   warplist:
     usage: /warplist
-    description: Shows list of available warps.
+    description: Shows list of available warps. STILL HAS TO BE DONE
     permission: owa.warp.list
   setzone:
     usage: /setzone <uniqueName> <s OR zc> (ONLY FOR zc) <spawnAmount> (ONLY FOR zc) <tickrate>
@@ -32,7 +32,20 @@ commands:
     usage: /removezone <uniqueName>
     description: Removes zone from given name.
     permission: owa.admin.zone.remove
+  zonelist:
+    usage: /zonelist
+    description: List's all existing zones.
+    permission: owa.admin.zone.list
   manageloot:
     usage: /manageloot (Optional) <name> (Optional) <time>
     description: Sets up a loot chest. Refills after <time> amount. If time == 0 it is one time only. If no time is entered it will delete the chest.
     permission: owa.admin.lootchest.manage
+  lootchestlist:
+    usage: /lootchestlist
+    description: List's all existing lootchests.
+    permission: owa.admin.lootchest.list
+  owareload:
+    usage: /owareload
+    description: Use this after assigning an admin-role from OWA to a player. Otherwise he can't do much with it.
+    permission: owa.admin
+    

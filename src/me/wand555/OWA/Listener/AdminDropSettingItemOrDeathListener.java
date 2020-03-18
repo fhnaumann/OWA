@@ -19,20 +19,32 @@ public class AdminDropSettingItemOrDeathListener implements Listener {
 	
 	@EventHandler
 	public void onAdminDropSettingItemEvent(PlayerDropItemEvent event) {
-		if(event.getPlayer().hasPermission("owa.admin.setzone")) {
+		if(event.getPlayer().hasPermission("owa.admin.zone.set") 
+				|| event.getPlayer().hasPermission("owa.admin.zone.remove")
+				|| event.getPlayer().hasPermission("owa.admin.lootchest.manage")) {
 			if(event.getItemDrop().getItemStack().isSimilar(OWA.hoeItem)) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage("You cannot drop your setzone item!");
+			}
+			if(event.getItemDrop().getItemStack().isSimilar(OWA.shovelItem)) {
+				event.setCancelled(true);
+				event.getPlayer().sendMessage("You cannot drop your lootchest item!");
 			}
 		}
 	}
 	
 	@EventHandler
 	public void onAdminWithSettingItemDeaethEvent(PlayerDeathEvent event) {
-		if(event.getEntity().hasPermission("owa.admin.setzone")) {
+		if(event.getEntity().hasPermission("owa.admin.zone.set") 
+				|| event.getEntity().hasPermission("owa.admin.zone.remove")
+				|| event.getEntity().hasPermission("owa.admin.lootchest.manage")) {
 			if(event.getDrops().contains(OWA.hoeItem)) {
 				event.getDrops().remove(OWA.hoeItem);
 				event.getEntity().sendMessage("You died with your setzone item. It got destroyed upon death");
+			}
+			if(event.getDrops().contains(OWA.shovelItem)) {
+				event.getDrops().remove(OWA.shovelItem);
+				event.getEntity().sendMessage("You died with your lootchest item. It got destroyed upon death");
 			}
 		}
 	}

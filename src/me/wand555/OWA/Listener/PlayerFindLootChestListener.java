@@ -3,8 +3,10 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -35,7 +37,8 @@ public class PlayerFindLootChestListener implements Listener {
 					System.out.println("here2");
 					//not a one time loot
 					if(lootChest.getTimer() != 0) {
-						lootChest.setRunningTask(new ReturnLootChest(lootChest).runTaskLater(OWA.getPlugin(OWA.class), lootChest.getTimer()));
+						lootChest.setReturnLootChest(new ReturnLootChest(lootChest));
+						lootChest.getReturnLootChest().runTaskLater(OWA.getPlugin(OWA.class), lootChest.getTimer());
 					}
 					else {
 						//remove lootchest indexes
@@ -48,6 +51,31 @@ public class PlayerFindLootChestListener implements Listener {
 					}
 					
 				}		
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerDestroyLootChestEvent(BlockBreakEvent event) {
+		if(event.getBlock().getState() instanceof Chest) {
+			LootChest lootChest = LootChest.getLootChestsFromLocation(event.getBlock().getLocation());
+			if(lootChest != null) {
+				if(!lootChest.isLooted()) {
+					lootChest.setLooted(true);
+					if(lootChest.getTimer() != 0) {
+						lootChest.setReturnLootChest(new ReturnLootChest(lootChest));
+						lootChest.getReturnLootChest().runTaskLater(OWA.getPlugin(OWA.class), lootChest.getTimer());
+					}
+					else {
+						//remove lootchest indexes
+						for(Entry<UUID, AdminProfile> entry : AdminProfile.getAdminProfiles().entrySet()) {
+							if(entry.getValue().getLootChests().contains(lootChest)) {
+								entry.getValue().getLootChests().remove(lootChest);
+							}
+						}
+						LootChest.getLootChests().remove(lootChest);
+					}
+				}
 			}
 		}
 	}
